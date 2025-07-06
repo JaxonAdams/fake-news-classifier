@@ -4,6 +4,7 @@ from pathlib import Path
 import kaggle
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
+from tensorflow.keras.preprocessing.text import Tokenizer
 
 
 # Custom Transformer for lowercasing
@@ -24,13 +25,16 @@ def main(config: dict) -> None:
     news_data = load_dataframe(download_dir_path)
 
     # Step 2: Clean
+    print("Cleaning the dataset...")
     news_data = remove_unneeded_features(news_data)
 
     lowercaser = TextLowercaser()
     news_data["content"] = lowercaser.transform(news_data["content"])
 
-    print("\nData sample:")
-    print(news_data.sample(n=8))
+    tokenize_text(news_data["content"])
+
+    # print("\nData sample:")
+    # print(news_data.sample(n=8))
 
 
 def download_dataset_if_not_present(
@@ -67,6 +71,17 @@ def remove_unneeded_features(data: pd.DataFrame) -> pd.DataFrame:
 
     data["content"] = data["title"] + "[SEP]" + data["text"]
     return data.drop(columns=["subject", "date", "title", "text"])
+
+
+def tokenize_text(text_fields: pd.DataFrame):
+
+    print("\nTokenizing data...")
+    tokenizer = Tokenizer(num_words=100, oov_token="<unk>")
+    tokenizer.fit_on_texts(text_fields)
+    word_index = tokenizer.word_index
+    print(f"Found {len(word_index)} unique tokens in the dataset.")
+
+    return tokenizer, word_index
 
 
 if __name__ == "__main__":
