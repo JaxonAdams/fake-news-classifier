@@ -2,11 +2,22 @@ import os
 from pathlib import Path
 
 import kaggle
+import pandas as pd
 
 
 def main(config: dict) -> None:
 
-    download_dataset_if_not_present(config["dataset"], config["download_dir_path"])
+    download_dir_path = config["download_dir_path"]
+
+    download_dataset_if_not_present(config["dataset"], download_dir_path)
+
+    true_news_data = pd.read_csv(os.path.join(download_dir_path, "True.csv"))
+    fake_news_data = pd.read_csv(os.path.join(download_dir_path, "Fake.csv"))
+
+    print("\nReal news data sample:")
+    print(true_news_data.head())
+    print("\nFake news data sample:")
+    print(fake_news_data.head())
 
 
 def download_dataset_if_not_present(dataset: str, download_dir_path: str) -> None:
