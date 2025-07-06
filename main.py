@@ -3,6 +3,7 @@ from pathlib import Path
 
 import kaggle
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -33,6 +34,14 @@ def main(config: dict) -> None:
     news_data["content"] = lowercaser.transform(news_data["content"])
 
     padded_sequences = tokenize_and_pad_text(news_data)
+
+    # Step 3: Split train and test data
+    X_train, X_test, y_train, y_test = train_test_split(
+        padded_sequences,
+        news_data["label"],
+        test_size=0.2,
+        random_state=42,
+    )
 
     print("\nData sample:")
     print(news_data.sample(n=8))
