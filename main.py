@@ -9,18 +9,21 @@ def main(config: dict) -> None:
 
     download_dir_path = config["download_dir_path"]
 
+    # Step 1: Load
     download_dataset_if_not_present(config["dataset"], download_dir_path)
+    news_data = load_dataframe(download_dir_path)
 
-    true_news_data = pd.read_csv(os.path.join(download_dir_path, "True.csv"))
-    fake_news_data = pd.read_csv(os.path.join(download_dir_path, "Fake.csv"))
+    # Step 2: Clean
+    news_data = remove_unneeded_features(news_data)
 
-    print("\nReal news data sample:")
-    print(true_news_data.head())
-    print("\nFake news data sample:")
-    print(fake_news_data.head())
+    print("\nData sample:")
+    print(news_data.sample(n=8))
 
 
-def download_dataset_if_not_present(dataset: str, download_dir_path: str) -> None:
+def download_dataset_if_not_present(
+    dataset: str,
+    download_dir_path: str,
+) -> None:
 
     true_news_data_path = Path(os.path.join(download_dir_path, "True.csv"))
     fake_news_data_path = Path(os.path.join(download_dir_path, "Fake.csv"))
@@ -34,6 +37,22 @@ def download_dataset_if_not_present(dataset: str, download_dir_path: str) -> Non
         path=download_dir_path,
         unzip=True,
     )
+
+
+def load_dataframe(download_dir_path: str) -> pd.DataFrame:
+
+    true_news_data = pd.read_csv(os.path.join(download_dir_path, "True.csv"))
+    true_news_data["label"] = "0"
+
+    fake_news_data = pd.read_csv(os.path.join(download_dir_path, "Fake.csv"))
+    fake_news_data["label"] = "1"
+
+    return pd.concat([true_news_data, fake_news_data])
+
+
+def remove_unneeded_features(data: pd.DataFrame) -> pd.DataFrame:
+
+    return data.drop(columns=["subject", "date"])
 
 
 if __name__ == "__main__":
