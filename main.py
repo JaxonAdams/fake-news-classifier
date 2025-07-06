@@ -3,6 +3,16 @@ from pathlib import Path
 
 import kaggle
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+
+
+# Custom Transformer for lowercasing
+class TextLowercaser(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self  # Nothing to learn in this step
+
+    def transform(self, X):
+        return [text.lower() for text in X]
 
 
 def main(config: dict) -> None:
@@ -15,6 +25,9 @@ def main(config: dict) -> None:
 
     # Step 2: Clean
     news_data = remove_unneeded_features(news_data)
+
+    lowercaser = TextLowercaser()
+    news_data["content"] = lowercaser.transform(news_data["content"])
 
     print("\nData sample:")
     print(news_data.sample(n=8))
@@ -52,7 +65,8 @@ def load_dataframe(download_dir_path: str) -> pd.DataFrame:
 
 def remove_unneeded_features(data: pd.DataFrame) -> pd.DataFrame:
 
-    return data.drop(columns=["subject", "date"])
+    data["content"] = data["title"] + "[SEP]" + data["text"]
+    return data.drop(columns=["subject", "date", "title", "text"])
 
 
 if __name__ == "__main__":
