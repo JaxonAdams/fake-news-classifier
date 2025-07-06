@@ -5,6 +5,7 @@ import kaggle
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
 # Custom Transformer for lowercasing
@@ -31,10 +32,10 @@ def main(config: dict) -> None:
     lowercaser = TextLowercaser()
     news_data["content"] = lowercaser.transform(news_data["content"])
 
-    tokenize_text(news_data["content"])
+    padded_sequences = tokenize_and_pad_text(news_data)
 
-    # print("\nData sample:")
-    # print(news_data.sample(n=8))
+    print("\nData sample:")
+    print(news_data.sample(n=8))
 
 
 def download_dataset_if_not_present(
@@ -73,15 +74,17 @@ def remove_unneeded_features(data: pd.DataFrame) -> pd.DataFrame:
     return data.drop(columns=["subject", "date", "title", "text"])
 
 
-def tokenize_text(text_fields: pd.DataFrame):
+def tokenize_and_pad_text(data: pd.DataFrame):
 
     print("\nTokenizing data...")
     tokenizer = Tokenizer(num_words=100, oov_token="<unk>")
-    tokenizer.fit_on_texts(text_fields)
+    tokenizer.fit_on_texts(data["content"])
     word_index = tokenizer.word_index
     print(f"Found {len(word_index)} unique tokens in the dataset.")
 
-    return tokenizer, word_index
+    sequences = tokenizer.texts_to_sequences(data["content"])
+    maxlen = max([len(seq) for seq in sequences])
+    return pad_sequences(sequences, maxlen=maxlen, padding="post")
 
 
 if __name__ == "__main__":
