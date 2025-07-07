@@ -1,19 +1,24 @@
 import os
 from pathlib import Path
+from collections import Counter
 
+import nltk
 import kaggle
-import numpy as np
 import pandas as pd
 import seaborn as sns
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import confusion_matrix, classification_report, roc_curve, auc
+from sklearn.metrics import confusion_matrix, roc_curve, auc
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+
+
+nltk.download("stopwords")
 
 
 # Custom Transformer for lowercasing
@@ -43,6 +48,7 @@ def main(config: dict) -> None:
     news_data["content"] = lowercaser.transform(news_data["content"])
 
     plot_headline_length_distribution(news_data.copy(), None, visualizations_save_path)
+    plot_top_words(news_data.copy(), None, visualizations_save_path)
 
     padded_sequences, tokenizer, maxlen = tokenize_and_pad_text(news_data)
 
@@ -227,6 +233,58 @@ def plot_headline_length_distribution(news_data, tokenizer, save_path):
     plt.ylabel("Frequency")
     plt.legend(title="News Type", labels=["Real News", "Fake News"])
     plt.savefig(os.path.join(save_path, "headline_length_distribution.png"))
+
+
+def plot_top_words(news_data, tokenizer, save_path, top_n=20):
+
+    stop_words = set(stopwords.words("english"))
+
+    real_headlines = news_data[news_data["label"] == 0]["content"]
+    fake_headlines = news_data[news_data["label"] == 1]["content"]
+
+    def get_word_frequencies(headlines):
+        all_words = []
+        for headline in headlines:
+            words = [
+                word
+                for word in headline.split()
+                if word.isalpha() and word not in stop_words
+            ]
+            all_words.extend(words)
+        return Counter(all_words)
+
+    real_word_counts = get_word_frequencies(real_headlines)
+    fake_word_counts = get_word_frequencies(fake_headlines)
+
+    # Plot most common words for real news headlines
+    plt.figure(figsize=(14, 6))
+    plt.subplot(1, 2, 1)
+    real_top_words = real_word_counts.most_common(top_n)
+    plt.barh(
+        [word for word, count in real_top_words],
+        [count for word, count in real_top_words],
+        color="skyblue",
+    )
+    plt.gca().invert_yaxis()
+    plt.title(f"Top {top_n} Most Common Words in Real News Headlines")
+    plt.xlabel("Frequency")
+    plt.ylabel("Word")
+
+    # Plot most common words for fake news headlines
+    plt.subplot(1, 2, 2)
+    fake_top_words = fake_word_counts.most_common(top_n)
+    plt.barh(
+        [word for word, count in fake_top_words],
+        [count for word, count in fake_top_words],
+        color="lightcoral",
+    )
+    plt.gca().invert_yaxis()
+    plt.title(f"Top {top_n} Most Common Words in Fake News Headlines")
+    plt.xlabel("Frequency")
+    plt.ylabel("Word")
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_path, "word_frequencies.png"))
 
 
 def plot_confusion_matrix(y_true, y_pred_proba, save_path, threshold=0.5):
