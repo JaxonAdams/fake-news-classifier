@@ -42,6 +42,8 @@ def main(config: dict) -> None:
     lowercaser = TextLowercaser()
     news_data["content"] = lowercaser.transform(news_data["content"])
 
+    plot_headline_length_distribution(news_data.copy(), None, visualizations_save_path)
+
     padded_sequences, tokenizer, maxlen = tokenize_and_pad_text(news_data)
 
     # Step 3: Split train and test data
@@ -206,6 +208,25 @@ def load_or_train_model(
         model.save(model_path)
         print(f"Model saved to {model_path}")
     return model
+
+
+def plot_headline_length_distribution(news_data, tokenizer, save_path):
+
+    news_data["content_length"] = news_data["content"].apply(lambda x: len(x.split()))
+
+    plt.figure(figsize=(10, 6))
+    sns.histplot(
+        data=news_data,
+        x="content_length",
+        hue="label",
+        kde=True,
+        bins=50,
+    )
+    plt.title("Distribution of Headline Lengths by News Type")
+    plt.xlabel("Number of Words in Headline")
+    plt.ylabel("Frequency")
+    plt.legend(title="News Type", labels=["Real News", "Fake News"])
+    plt.savefig(os.path.join(save_path, "headline_length_distribution.png"))
 
 
 def plot_confusion_matrix(y_true, y_pred_proba, save_path, threshold=0.5):
