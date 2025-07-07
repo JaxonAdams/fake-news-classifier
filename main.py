@@ -66,6 +66,27 @@ def main(config: dict) -> None:
     print(f"Concatenated Model Test Loss: {loss:.4f}")
     print(f"Concatenated Model Test Accuracy: {accuracy:.4f}")
 
+    print("\n\nPREDICTING ON NEW DATA:")
+
+    headlines = [
+        "Trump dismisses Musk's political ambitions as 'ridiculous' in sharp rebuke",  # Fox News
+        "Camp Mystic confirms 27 dead in Texas floods as more rain looms",  # CNN
+        "After setback to Iran's nuclear program, Trump expected to leverage military support in Netanyahu meeting",  # Fox News
+        "Peter Thiel Shows Trump How To Sort Spreadsheet Of Americans By Ethnicity",  # The Onion
+        "Study Finds Tiny Nose Robots Can Be Used To Clean Sinuses",  # The Onion
+    ]
+
+    headlines_lower = lowercaser.transform(headlines)
+    new_sequences = tokenizer.texts_to_sequences(headlines_lower)
+    new_padded_sequences = pad_sequences(
+        new_sequences, maxlen=maxlen, padding='post')
+
+    predictions = model.predict(new_padded_sequences)
+
+    for i, headline in enumerate(headlines):
+        is_fake = "LIKELY FAKE!" if predictions[i][0] > 0.5 else "Not likely to be fake."
+        print(f"\nHeadline:\n\"{headline}\"\nModel prediction: \"{is_fake}\"")
+
 
 def download_dataset_if_not_present(
     dataset: str,
