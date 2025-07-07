@@ -72,7 +72,12 @@ def main(config: dict) -> None:
     print(f"Concatenated Model Test Accuracy: {accuracy:.4f}")
 
     y_pred_proba = model.predict(X_test)
-    plot_confusion_matrix(y_test, y_pred_proba, save_path=visualizations_save_path)
+    plot_confusion_matrix(
+        y_test,
+        y_pred_proba,
+        save_path=visualizations_save_path,
+    )
+    plot_roc_curve(y_test, y_pred_proba, save_path=visualizations_save_path)
 
     print("\n\nPREDICTING ON NEW DATA:")
 
@@ -222,6 +227,35 @@ def plot_confusion_matrix(y_true, y_pred_proba, save_path, threshold=0.5):
     plt.xlabel("Predicted Label")
     plt.ylabel("True Label")
     plt.savefig(os.path.join(save_path, "confusion_matrix.png"))
+
+
+def plot_roc_curve(y_true, y_pred_proba, save_path):
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure(figsize=(7, 6))
+    plt.plot(
+        fpr,
+        tpr,
+        color="darkorange",
+        lw=2,
+        label=f"ROC curve (AUC = {roc_auc:.2f})",
+    )
+    plt.plot(
+        [0, 1],
+        [0, 1],
+        color="navy",
+        lw=2,
+        linestyle="--",
+        label="Random Classifier",
+    )
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.legend(loc="lower right")
+    plt.grid(True)
+    plt.savefig(os.path.join(save_path, "roc_curve.png"))
 
 
 if __name__ == "__main__":
