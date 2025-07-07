@@ -5,12 +5,12 @@ Many thanks to `clmentbisaillon` for providing this dataset! (retrieved from [Ka
 ## Visualizations
 ### Model Performance
 #### Confusion Matrix
-![confusion_matrix](https://github.com/user-attachments/assets/52b301c3-9b15-44d3-8126-77da9a599489)
+![confusion_matrix](https://github.com/user-attachments/assets/4a83822d-87d6-4608-b226-aec3e85feb5f)
 #### ROC Curve / AUC
-![roc_curve](https://github.com/user-attachments/assets/0a9ca3df-cc7d-4ca4-a502-79b83612696b)
+![roc_curve](https://github.com/user-attachments/assets/97c38bc8-33b4-4f7d-a026-1078da6ec97c)
 ### Data Exploration
 #### Headline Length Distribution
-![headline_length_distribution](https://github.com/user-attachments/assets/fb3d9790-07b6-42c7-acce-1c4caa190f63)
+![headline_length_distribution](https://github.com/user-attachments/assets/e79844e7-1b58-497a-9e4c-ba80e393b988)
 #### Word Frequencies
 ![word_frequencies](https://github.com/user-attachments/assets/84406c93-a899-47df-8db8-40b2451b934a)
 
