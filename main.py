@@ -99,14 +99,14 @@ def load_dataframe(download_dir_path: str) -> pd.DataFrame:
 
 def remove_unneeded_features(data: pd.DataFrame) -> pd.DataFrame:
 
-    data["content"] = data["title"] + "[SEP]" + data["text"]
+    data["content"] = data["title"]
     return data.drop(columns=["subject", "date", "title", "text"])
 
 
 def tokenize_and_pad_text(data: pd.DataFrame):
 
     print("\nTokenizing data...")
-    tokenizer = Tokenizer(num_words=10000, oov_token="<unk>")
+    tokenizer = Tokenizer(num_words=1000, oov_token="<unk>")
     tokenizer.fit_on_texts(data["content"])
     word_index = tokenizer.word_index
     print(f"Found {len(word_index)} unique tokens in the dataset.")
@@ -158,11 +158,11 @@ def load_or_train_model(
         )
 
         print("Training the concatenated model...")
-        history = model.fit(
+        model.fit(
             X_train,
             y_train,
             epochs=20,
-            batch_size=32,
+            batch_size=2,
             validation_split=0.1,
             verbose=1,
         )
