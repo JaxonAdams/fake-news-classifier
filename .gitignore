@@ -2,3 +2,4 @@ venv
 .venv
 
 data/input/kaggle/*
+data/output/model/*

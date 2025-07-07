@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
     DATASET = "clmentbisaillon/fake-and-real-news-dataset"
     DOWNLOAD_TO_DIR = "data/input/kaggle"
-    MODEL_DIR = "data/output/model"
+    MODEL_DIR = "data/output/model/LSTM.keras"
 
     config = {
         "dataset": DATASET,
