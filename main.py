@@ -4,8 +4,9 @@ from pathlib import Path
 import kaggle
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import tensorflow as tf
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import confusion_matrix, classification_report, roc_curve, auc
@@ -28,6 +29,7 @@ def main(config: dict) -> None:
 
     download_dir_path = config["download_dir_path"]
     model_save_path = config["model_save_path"]
+    visualizations_save_path = config["visualizations_save_path"]
 
     # Step 1: Load
     download_dataset_if_not_present(config["dataset"], download_dir_path)
@@ -69,6 +71,9 @@ def main(config: dict) -> None:
     print(f"Concatenated Model Test Loss: {loss:.4f}")
     print(f"Concatenated Model Test Accuracy: {accuracy:.4f}")
 
+    y_pred_proba = model.predict(X_test)
+    plot_confusion_matrix(y_test, y_pred_proba, save_path=visualizations_save_path)
+
     print("\n\nPREDICTING ON NEW DATA:")
 
     headlines = [
@@ -81,14 +86,15 @@ def main(config: dict) -> None:
 
     headlines_lower = lowercaser.transform(headlines)
     new_sequences = tokenizer.texts_to_sequences(headlines_lower)
-    new_padded_sequences = pad_sequences(
-        new_sequences, maxlen=maxlen, padding='post')
+    new_padded_sequences = pad_sequences(new_sequences, maxlen=maxlen, padding="post")
 
     predictions = model.predict(new_padded_sequences)
 
     for i, headline in enumerate(headlines):
-        is_fake = "LIKELY FAKE!" if predictions[i][0] > 0.5 else "Not likely to be fake."
-        print(f"\nHeadline:\n\"{headline}\"\nModel prediction: \"{is_fake}\"")
+        is_fake = (
+            "LIKELY FAKE!" if predictions[i][0] > 0.5 else "Not likely to be fake."
+        )
+        print(f'\nHeadline:\n"{headline}"\nModel prediction: "{is_fake}"')
 
 
 def download_dataset_if_not_present(
@@ -152,7 +158,7 @@ def load_or_train_model(
     X_train,
     y_train,
     X_test,
-    y_test
+    y_test,
 ) -> tf.keras.Model:
     """
     Loads an existing model if available, otherwise compiles and trains a new one.
@@ -197,16 +203,39 @@ def load_or_train_model(
     return model
 
 
+def plot_confusion_matrix(y_true, y_pred_proba, save_path, threshold=0.5):
+
+    y_pred_classes = (y_pred_proba > threshold).astype(int)
+    cm = confusion_matrix(y_true, y_pred_classes)
+
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap="Blues",
+        cbar=False,
+        xticklabels=["Real News (0)", "Fake News (1)"],
+        yticklabels=["Real News (0)", "Fake News (1)"],
+    )
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted Label")
+    plt.ylabel("True Label")
+    plt.savefig(os.path.join(save_path, "confusion_matrix.png"))
+
+
 if __name__ == "__main__":
 
     DATASET = "clmentbisaillon/fake-and-real-news-dataset"
     DOWNLOAD_TO_DIR = "data/input/kaggle"
     MODEL_DIR = "data/output/model/LSTM.keras"
+    VISUALIZATIONS_DIR = "data/output/visualizations"
 
     config = {
         "dataset": DATASET,
         "download_dir_path": DOWNLOAD_TO_DIR,
         "model_save_path": MODEL_DIR,
+        "visualizations_save_path": VISUALIZATIONS_DIR,
     }
 
     main(config)
