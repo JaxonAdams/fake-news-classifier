@@ -1,5 +1,5 @@
 # Fake News Classifier
-Many thanks to `clmentbisaillon` for hosting this dataset! (retrieved from [Kaggle](https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset))
+Many thanks to `clmentbisaillon` for providing this dataset! (retrieved from [Kaggle](https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset))
 
 ---
 ## Visualizations
