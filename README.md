@@ -1,5 +1,7 @@
 # Fake News Classifier
 This project presents a comprehensive, end-to-end solution for classifying news headlines as "Real News" or "Fake News." It demonstrates proficiency in machine learning model development, cloud infrastructure deployment using Infrastructure as Code (IaC), serverless architecture, API design, and modern web frontend development.
+Visit the deployed site to interact with the model [here!](http://fake-news-classifier-jaxonadams-frontend.s3-website-us-west-1.amazonaws.com/)
+
 ![image](https://github.com/user-attachments/assets/5cd82575-c2d0-4ba3-b9d8-05d4b5d04095)
 ---
 ## Model Details & Performance
