@@ -7,3 +7,10 @@ data/output/model
 data/output/model_assets
 
 cdk.out
+
+.cpcache
+.lsp
+.clj-kondo
+frontend/.clj-kondo
+frontend/.cpcache
+frontend/.lsp
