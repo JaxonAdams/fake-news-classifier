@@ -1,6 +1,5 @@
 # Fake News Classifier
-Many thanks to `clmentbisaillon` for providing this dataset! (retrieved from [Kaggle](https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset))
-
+![image](https://github.com/user-attachments/assets/5cd82575-c2d0-4ba3-b9d8-05d4b5d04095)
 ---
 ## Visualizations
 ### Model Performance
@@ -15,3 +14,5 @@ Many thanks to `clmentbisaillon` for providing this dataset! (retrieved from [Ka
 ![headline_length_distribution](https://github.com/user-attachments/assets/e79844e7-1b58-497a-9e4c-ba80e393b988)
 #### Word Frequencies
 ![word_frequencies](https://github.com/user-attachments/assets/84406c93-a899-47df-8db8-40b2451b934a)
+---
+Many thanks to `clmentbisaillon` for providing this dataset! (retrieved from [Kaggle](https://www.kaggle.com/datasets/clmentbisaillon/fake-and-real-news-dataset))
