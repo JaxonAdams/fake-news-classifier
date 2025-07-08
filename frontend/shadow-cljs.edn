@@ -1,6 +1,7 @@
 {:source-paths ["src/cljs"]
 
- :dependencies [[reagent/reagent "1.2.0"]]
+ :dependencies [[reagent/reagent "1.2.0"]
+                [lambdaisland/fetch "1.5.83"]]
 
  :builds {:app {:target :browser
                 :output-dir "public/js"
@@ -8,4 +9,5 @@
                 :modules {:main {:init-fn fake-news-classifier.core/init}}
                 :compiler-options {:optimizations :advanced}
                 :dev {:closure-defines {fake-news-classifier.core/api-gateway-url ""}}
-                :release {:closure-defines {fake-news-classifier.core/api-gateway-url ""}}}}}
+                :release {:closure-defines {fake-news-classifier.core/api-gateway-url ""}}}}
+ :dev-http {8000 "public"}}

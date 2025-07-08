@@ -1,0 +1,21 @@
+# frontend/render.yaml
+# This file configures a static site on Render.com
+# It defines the build process for the ClojureScript application
+# and specifies the directory to serve.
+
+services:
+  - type: static
+    name: fake-news-classifier-frontend
+    rootDir: frontend/
+    buildCommand: |
+      apt-get update && apt-get install -y openjdk-17-jdk-headless
+      curl -L -o /usr/local/bin/clj https://download.clojure.org/install/linux-install-1.11.1.1165.sh
+      chmod +x /usr/local/bin/clj
+      apt-get install -y python3-pip
+      apt-get install -y npm
+      npm install
+      ./node_modules/.bin/shadow-cljs release app --config-merge '{:builds {:app {:closure-defines {fake-news-classifier.core/api-gateway-url "$API_GATEWAY_URL"}}}}'
+    publishPath: public
+    envVars:
+      - key: API_GATEWAY_URL
+        value: "https://d09r3jvmpj.execute-api.us-west-1.amazonaws.com/prod"

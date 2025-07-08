@@ -11,6 +11,10 @@ cdk.out
 .cpcache
 .lsp
 .clj-kondo
+.shadow-cljs
+cljs-runtime
 frontend/.clj-kondo
 frontend/.cpcache
 frontend/.lsp
+frontend/node_modules
+frontend/public/js/*
