@@ -1,11 +1,15 @@
 import os
 
 import nltk
+import boto3
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 from src.data_loader import download_dataset_if_not_present, load_dataframe
-from src.preprocessing import remove_unneeded_features, tokenize_and_pad_text
+from src.preprocessing import (
+    remove_unneeded_features,
+    tokenize_and_pad_text,
+    save_tokenizer,
+)
 from src.model import load_or_train_model
 from src.visualizations import (
     plot_headline_length_distribution,
@@ -29,11 +33,13 @@ def main() -> None:
 
     download_dir_path = config["download_dir_path"]
     model_save_path = config["model_save_path"]
+    tokenizer_save_path = config["tokenizer_save_path"]
     visualizations_save_path = config["visualizations_save_path"]
+    model_assets_dir = os.path.dirname(model_save_path)
 
     # Create output directories if they don't exist
     os.makedirs(download_dir_path, exist_ok=True)
-    os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
+    os.makedirs(model_assets_dir, exist_ok=True)
     os.makedirs(visualizations_save_path, exist_ok=True)
 
     # Step 1: Load Data
@@ -56,6 +62,8 @@ def main() -> None:
 
     # Tokenize and pad for model training
     padded_sequences, tokenizer, maxlen = tokenize_and_pad_text(news_data_cleaned)
+    save_tokenizer(tokenizer, tokenizer_save_path)
+    print(f"\nMAX SEQUENCE LENGTH: {maxlen}")
 
     # Step 3: Split train and test data
     X_train, X_test, y_train, y_test = train_test_split(
@@ -89,30 +97,23 @@ def main() -> None:
     plot_confusion_matrix(y_test, y_pred_proba, visualizations_save_path)
     plot_roc_curve(y_test, y_pred_proba, visualizations_save_path)
 
-    print("\n\nPREDICTING ON NEW DATA:")
-    headlines = [
-        "Trump dismisses Musk's political ambitions as 'ridiculous' in sharp rebuke",
-        "Camp Mystic confirms 27 dead in Texas floods as more rain looms",
-        "After setback to Iran's nuclear program, Trump expected to leverage military support in Netanyahu meeting",
-        "Peter Thiel Shows Trump How To Sort Spreadsheet Of Americans By Ethnicity",
-        "Study Finds Tiny Nose Robots Can Be Used To Clean Sinuses",
-    ]
+    # Step 5: Upload model and tokenizer to S3 for Lambda deployment
+    s3 = boto3.client("s3")
+    bucket_name = config["s3_bucket_name"]
+    model_s3_key = config["s3_model_key"]
+    tokenizer_s3_key = config["s3_tokenizer_key"]
 
-    headlines_lower = lowercaser.transform(headlines)
-    new_sequences = tokenizer.texts_to_sequences(headlines_lower)
-    new_padded_sequences = pad_sequences(
-        new_sequences,
-        maxlen=maxlen,
-        padding="post",
+    print(
+        f"\nUploading model '{os.path.basename(model_save_path)}' to s3://{bucket_name}/{model_s3_key}..."
     )
+    s3.upload_file(model_save_path, bucket_name, model_s3_key)
+    print("Model uploaded.")
 
-    predictions = model.predict(new_padded_sequences)
-
-    for i, headline in enumerate(headlines):
-        is_fake = (
-            "LIKELY FAKE!" if predictions[i][0] > 0.5 else "Not likely to be fake."
-        )
-        print(f'\nHeadline:\n"{headline}"\nModel prediction: "{is_fake}"')
+    print(
+        f"Uploading tokenizer '{os.path.basename(tokenizer_save_path)}' to s3://{bucket_name}/{tokenizer_s3_key}..."
+    )
+    s3.upload_file(tokenizer_save_path, bucket_name, tokenizer_s3_key)
+    print("Tokenizer uploaded.")
 
 
 if __name__ == "__main__":

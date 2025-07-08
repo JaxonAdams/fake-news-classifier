@@ -1,9 +1,11 @@
+import os
+import json
+
 import pandas as pd
-from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.text import Tokenizer, tokenizer_from_json
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 from config import config
-from src.custom_transformers import TextLowercaser
 
 
 def remove_unneeded_features(data: pd.DataFrame) -> pd.DataFrame:
@@ -34,3 +36,21 @@ def tokenize_and_pad_text(data: pd.DataFrame):
     padded_sequences = pad_sequences(sequences, maxlen=maxlen, padding="post")
     print("Text tokenization and padding complete.")
     return padded_sequences, tokenizer, maxlen
+
+
+def save_tokenizer(tokenizer: Tokenizer, path: str):
+    """Save the tokenizer to a JSON file."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tokenizer_json = tokenizer.to_json()
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(json.dumps(tokenizer_json, ensure_ascii=False))
+    print(f"Tokenizer saved to {path}")
+
+
+def load_tokenizer(path: str) -> Tokenizer:
+    """Load the tokenizer from a JSON file."""
+    with open(path, "r", encoding="utf-8") as f:
+        tokenizer_json = json.load(f)
+    tokenizer = tokenizer_from_json(tokenizer_json)
+    print(f"Tokenizer loaded from {path}")
+    return tokenizer

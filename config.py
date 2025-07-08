@@ -6,7 +6,11 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 config = {
     "dataset": "clmentbisaillon/fake-and-real-news-dataset",
     "download_dir_path": os.path.join(DATA_DIR, "input", "kaggle"),
-    "model_save_path": os.path.join(DATA_DIR, "output", "model", "LSTM.keras"),
+    "model_save_path": os.path.join(DATA_DIR, "output", "model_assets", "LSTM.keras"),
+    "tokenizer_save_path": os.path.join(
+        DATA_DIR, "output", "model_assets", "tokenizer.json"
+    ),
+    "max_sequence_length": 44,
     "visualizations_save_path": os.path.join(DATA_DIR, "output", "visualizations"),
     "tokenizer_num_words": 10000,
     "embedding_dim": 50,
@@ -20,4 +24,9 @@ config = {
     "test_size": 0.2,
     "random_state": 42,
     "prediction_threshold": 0.5,
+    "s3_bucket_name": "fake-news-classifier-ml-assets-jaxonadams",
+    "s3_model_key": "model/LSTM.keras",
+    "s3_tokenizer_key": "model/tokenizer.json",
+    "lambda_memory_mb": 3000,
+    "lambda_timeout_seconds": 90,
 }
