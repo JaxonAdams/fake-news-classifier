@@ -1,5 +1,6 @@
 # Fake News Classifier
 This project presents a comprehensive, end-to-end solution for classifying news headlines as "Real News" or "Fake News." It demonstrates proficiency in machine learning model development, cloud infrastructure deployment using Infrastructure as Code (IaC), serverless architecture, API design, and modern web frontend development.
+
 Visit the deployed site to interact with the model [here!](http://fake-news-classifier-jaxonadams-frontend.s3-website-us-west-1.amazonaws.com/)
 
 ![image](https://github.com/user-attachments/assets/5cd82575-c2d0-4ba3-b9d8-05d4b5d04095)
@@ -27,7 +28,7 @@ The model's performance was rigorously evaluated on a dedicated test set (8,980 
   macro avg       0.97      0.97      0.97      8980
 weighted avg      0.97      0.97      0.97      8980
 ```
-These metrics indicate that the model achieves **consistently high precision, recall, and F1-scores for both "Real News" and "Fake News" classes**, suggesting a robust ability to correctly identify and destingquish between them on data similar to its training distribution.
+These metrics indicate that the model achieves **consistently high precision, recall, and F1-scores for both "Real News" and "Fake News" classes**, suggesting a robust ability to correctly identify and distinguish between them on data similar to its training distribution.
 ### Performance Visualizations:
 #### ROC Curve / AUC
 ![roc_curve](https://github.com/user-attachments/assets/97c38bc8-33b4-4f7d-a026-1078da6ec97c)
@@ -40,7 +41,9 @@ While the quantitative measures are excellent, manual testing with diverse, real
 This observation is a valuable insight into the practical challenges of deploying ML models:
 - **Data Distribution Shift**: The model's training data may not fully capture the stylistic nuances, evolving language, or specific characteristics of all real-world news content, particularly satirical news (like from The Onion), which is intentionally crafted to mimic legitimate news, differing significantly from common "fake news" patterns in the training dataset.
 - **Definition of "Fake News"**: The model's definition of "fake news" is derived solely from its training data, which might not encompass the full spectrum of human interpretation (e.g., distinguishing satire from malicious misinformation).
+
 This project demonstrates an understanding that high offline metrics do not always translate perfectly to real-world scenarios, emphasizing the importance of continuous monitoring, representative data collection, and iterative model improvement in MLOps.
+
 Still, the metrics above demonstrate that the project's initial goal of creating a model capable of distinguishing between fake and real news was met, and its performance is admirable.
 
 ## Key Features
