@@ -4,6 +4,6 @@ __pycache__
 
 data/input/kaggle
 data/output/model
-data/output/model-assets
+data/output/model_assets
 
 cdk.out
