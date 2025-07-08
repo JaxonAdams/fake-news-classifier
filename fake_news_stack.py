@@ -5,9 +5,10 @@ from constructs import Construct
 from aws_cdk import (
     aws_lambda as lambda_,
     aws_s3 as s3,
-    aws_iam as iam,
+    aws_s3_deployment as s3deploy,
     aws_apigateway as apigw,
     Duration,
+    RemovalPolicy,
 )
 
 
@@ -115,4 +116,36 @@ class FakeNewsClassifierStack(cdk.Stack):
             self,
             "ApiUrl",
             value=api.url_for_path("/predict"),
+        )
+
+        # S3 bucket for hosting the static frontend
+        frontend_bucket = s3.Bucket(
+            self,
+            "FakeNewsClassifierFrontendBucket",
+            website_index_document="index.html",
+            website_error_document="index.html",
+            public_read_access=True,
+            block_public_access=s3.BlockPublicAccess(
+                block_public_acls=False,
+                ignore_public_acls=False,
+                block_public_policy=False,
+                restrict_public_buckets=False,
+            ),
+            removal_policy=RemovalPolicy.DESTROY,
+            auto_delete_objects=True,
+            bucket_name="fake-news-classifier-jaxonadams-frontend",
+        )
+
+        s3deploy.BucketDeployment(
+            self,
+            "FakeNewsClassifierFrontendDeploy",
+            sources=[s3deploy.Source.asset("frontend/public")],
+            destination_bucket=frontend_bucket,
+        )
+
+        cdk.CfnOutput(
+            self,
+            "FrontendUrl",
+            value=frontend_bucket.bucket_website_url,
+            description="The URL of the frontend static website",
         )

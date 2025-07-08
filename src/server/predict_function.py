@@ -21,6 +21,11 @@ s3_client = boto3.client("s3")
 LOCAL_MODEL_PATH = "/tmp/LSTM.keras"
 LOCAL_TOKENIZER_PATH = "/tmp/tokenizer.json"
 
+FAKE_WARNING_MESSAGE = "Careful! This may be fake news."
+NOT_FAKE_MESSAGE = (
+    "No signs of fake news detected. Still exercise caution and check its sources!"
+)
+
 
 def load_assets_from_s3():
     """
@@ -108,7 +113,12 @@ def lambda_handler(event, context):
             )
             return {
                 "statusCode": 200,
-                "headers": {"Content-Type": "application/json"},
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Content-Type",
+                    "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+                },
                 "body": json.dumps(
                     {
                         "headline": news_headline,
@@ -130,13 +140,16 @@ def lambda_handler(event, context):
             "headline": news_headline,
             "is_fake_news": is_fake,
             "confidence": confidence,
-            "message": "LIKELY FAKE!" if is_fake else "Not likely to be fake.",
+            "message": FAKE_WARNING_MESSAGE if is_fake else NOT_FAKE_MESSAGE,
         }
 
         return {
             "statusCode": 200,
             "headers": {
                 "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
             },
             "body": json.dumps(response_body),
         }

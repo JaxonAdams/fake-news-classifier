@@ -1,12 +1,13 @@
 (ns fake-news-classifier.core
   (:require [reagent.core :as r]
             ["react-dom/client" :as ReactDOMClient]
-            [lambdaisland.fetch :as fetch]))
+            [lambdaisland.fetch :as http]
+            [cljs.core :as c]))
 
 (defonce container (.getElementById js/document "app"))
 (defonce root (.createRoot ReactDOMClient container))
 
-(def ^:private api-gateway-url nil)
+(def ^:private api-gateway-url "https://d09r3jvmpj.execute-api.us-west-1.amazonaws.com/prod")
 
 (def app-state (r/atom {:headline ""
                         :prediction-result nil
@@ -18,18 +19,20 @@
         url (str api-gateway-url "/predict")]
     (when (not-empty headline)
       (r/rswap! app-state assoc :loading? true :error-message nil)
-      (-> (fetch/post url
-                      {:body (js/JSON.stringify #js {:title headline})
-                       :headers {"Content-Type" "application/json"}})
+      (-> (http/post url
+                     {:body {:headline headline}
+                      :content-type :json
+                      :headers {"Content-Type" "application/json"}})
           (.then (fn [response]
-                   (if (.-ok response)
-                     (.json response)
-                     (throw (js/Error. (str "HTTP Error: " (.-status response) " - " (.-statusText response)))))))
-          (.then (fn [json-data]
-                   (r/rswap! app-state assoc
-                             :prediction-result json-data
-                             :loading? false)))
+                   (let [body (-> response :body (js->clj :keywordize-keys true))
+                         status (:status response)]
+                     (if (<= 200 status 299)
+                       (r/rswap! app-state assoc
+                                 :prediction-result body
+                                 :loading? false)
+                       (throw (js/Error. (str "HTTP Error " status " - " (pr-str body))))))))
           (.catch (fn [error]
+                    (js/console.error "Fetch error:" error)
                     (r/rswap! app-state assoc
                               :error-message (str "Fetch Error: " (.-message error))
                               :loading? false)))))))
@@ -61,7 +64,6 @@
        [:div.bg-gray-100.p-4.rounded-lg.shadow-md
         [:h3.text-lg.font-semibold.mb-2 "Prediction Result:"]
         [:p.mb-1 [:strong "Headline: "] (:headline prediction-result)]
-        [:p.mb-1 [:strong "Is Fake News: "] (str (:is_fake_news prediction-result))]
         [:p.mb-1 [:strong "Message: "] (:message prediction-result)]])]))
 
 (defn app-root []

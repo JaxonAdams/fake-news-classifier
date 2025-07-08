@@ -7,7 +7,5 @@
                 :output-dir "public/js"
                 :asset-path "/js"
                 :modules {:main {:init-fn fake-news-classifier.core/init}}
-                :compiler-options {:optimizations :advanced}
-                :dev {:closure-defines {fake-news-classifier.core/api-gateway-url ""}}
-                :release {:closure-defines {fake-news-classifier.core/api-gateway-url ""}}}}
+                :compiler-options {:optimizations :advanced}}}
  :dev-http {8000 "public"}}
