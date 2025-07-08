@@ -8,11 +8,6 @@ services:
     name: fake-news-classifier-frontend
     rootDir: frontend/
     buildCommand: |
-      apt-get update && apt-get install -y openjdk-17-jdk-headless
-      curl -L -o /usr/local/bin/clj https://download.clojure.org/install/linux-install-1.11.1.1165.sh
-      chmod +x /usr/local/bin/clj
-      apt-get install -y python3-pip
-      apt-get install -y npm
       npm install
       ./node_modules/.bin/shadow-cljs release app --config-merge '{:builds {:app {:closure-defines {fake-news-classifier.core/api-gateway-url "$API_GATEWAY_URL"}}}}'
     publishPath: public
