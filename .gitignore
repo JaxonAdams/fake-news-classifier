@@ -1,5 +1,9 @@
 venv
 .venv
+__pycache__
 
 data/input/kaggle
 data/output/model
+data/output/model-assets
+
+cdk.out
